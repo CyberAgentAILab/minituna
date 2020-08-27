@@ -7,11 +7,7 @@ def objective(trial: minituna.Trial) -> float:
     return (x - 3) ** 2 + (y - 5) ** 2
 
 
-def main():
+if __name__ == "__main__":
     study = minituna.create_study()
     study.optimize(objective, 10)
-    print("Best trial:", study.best_trial())
-
-
-if __name__ == "__main__":
-    main()
+    print("Best trial:", study.best_trial)
