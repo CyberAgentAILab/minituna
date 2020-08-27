@@ -1,3 +1,5 @@
+# type: ignore
+
 import minituna_v2 as minituna
 
 import sklearn.datasets

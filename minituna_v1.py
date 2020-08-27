@@ -35,9 +35,6 @@ class Storage:
         self.trials.append(trial)
         return trial_id
 
-    def get_all_trials(self) -> List[FrozenTrial]:
-        return self.trials
-
     def get_trial(self, trial_id: int) -> FrozenTrial:
         return self.trials[trial_id]
 

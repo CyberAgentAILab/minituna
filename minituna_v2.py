@@ -101,9 +101,6 @@ class Storage:
         self.trials.append(trial)
         return trial_id
 
-    def get_all_trials(self) -> List[FrozenTrial]:
-        return self.trials
-
     def get_trial(self, trial_id: int) -> FrozenTrial:
         return self.trials[trial_id]
 
@@ -156,6 +153,7 @@ class Trial:
         return self.suggest_float(name, low, high, log=True)
 
     def suggest_float(self, name: str, low: float, high: float, log=False) -> float:
+        distribution: BaseDistribution
         if log:
             distribution = LogUniformDistribution(low=low, high=high)
         else:
