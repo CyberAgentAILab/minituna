@@ -1,4 +1,4 @@
-import minituna
+import minituna_v1 as minituna
 
 
 def objective(trial: minituna.Trial) -> float:

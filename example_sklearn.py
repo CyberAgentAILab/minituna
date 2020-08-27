@@ -1,4 +1,4 @@
-import minituna
+import minituna_v2 as minituna
 
 import sklearn.datasets
 import sklearn.ensemble
