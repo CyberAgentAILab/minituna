@@ -1,4 +1,5 @@
 import abc
+import math
 import random
 
 from dataclasses import dataclass, field
@@ -31,6 +32,30 @@ class UniformDistribution(BaseDistribution):
 
     def to_external_repr(self, internal_repr: float) -> Any:
         return internal_repr
+
+
+class LogUniformDistribution(BaseDistribution):
+    def __init__(self, low: float, high: float) -> None:
+        self.low = low
+        self.high = high
+
+    def to_internal_repr(self, external_repr: Any) -> float:
+        return external_repr
+
+    def to_external_repr(self, internal_repr: float) -> Any:
+        return internal_repr
+
+
+class IntUniformDistribution(BaseDistribution):
+    def __init__(self, low: int, high: int) -> None:
+        self.low = low
+        self.high = high
+
+    def to_internal_repr(self, external_repr: Any) -> float:
+        return float(external_repr)
+
+    def to_external_repr(self, internal_repr: float) -> Any:
+        return int(internal_repr)
 
 
 class CategoricalDistribution(BaseDistribution):
@@ -125,7 +150,20 @@ class Trial:
         return param_value
 
     def suggest_uniform(self, name: str, low: float, high: float) -> float:
-        return self._suggest(name, UniformDistribution(low=low, high=high))
+        return self.suggest_float(name, low, high, log=False)
+
+    def suggest_loguniform(self, name: str, low: float, high: float) -> float:
+        return self.suggest_float(name, low, high, log=True)
+
+    def suggest_float(self, name: str, low: float, high: float, log=False) -> float:
+        if log:
+            distribution = LogUniformDistribution(low=low, high=high)
+        else:
+            distribution = UniformDistribution(low=low, high=high)
+        return self._suggest(name, distribution)
+
+    def suggest_int(self, name: str, low: int, high: int) -> float:
+        return self._suggest(name, IntUniformDistribution(low=low, high=high))
 
     def suggest_categorical(
         self, name: str, choices: List[CategoricalChoiceType]
@@ -170,6 +208,12 @@ class RandomSampler:
     ) -> Any:
         if isinstance(distribution, UniformDistribution):
             return self.rng.uniform(distribution.low, distribution.high)
+        elif isinstance(distribution, LogUniformDistribution):
+            log_low = math.log(distribution.low)
+            log_high = math.log(distribution.high)
+            return math.exp(self.rng.uniform(log_low, log_high))
+        elif isinstance(distribution, IntUniformDistribution):
+            return self.rng.randint(distribution.low, distribution.high)
         elif isinstance(distribution, CategoricalDistribution):
             index = self.rng.randint(0, len(distribution.choices) - 1)
             return distribution.choices[index]

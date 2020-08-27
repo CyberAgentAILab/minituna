@@ -1,17 +1,30 @@
 import minituna
 
+import sklearn.datasets
+import sklearn.ensemble
+import sklearn.model_selection
+import sklearn.svm
 
-def objective(trial: minituna.Trial) -> float:
-    x = trial.suggest_uniform("x", 0, 10)
-    y = trial.suggest_uniform("y", 0, 10)
-    value = (x - 3) ** 2 + (y - 5) ** 2
 
-    z = trial.suggest_categorical("z", ["foo", "bar"])
-    if z == "foo":
-        value += 1
+def objective(trial):
+    iris = sklearn.datasets.load_iris()
+    x, y = iris.data, iris.target
+
+    classifier_name = trial.suggest_categorical("classifier", ["SVC", "RandomForest"])
+    if classifier_name == "SVC":
+        svc_c = trial.suggest_float("svc_c", 1e-10, 1e10, log=True)
+        classifier_obj = sklearn.svm.SVC(C=svc_c, gamma="auto")
     else:
-        value += 2
-    return value
+        rf_max_depth = trial.suggest_int("rf_max_depth", 2, 32)
+        classifier_obj = sklearn.ensemble.RandomForestClassifier(
+            max_depth=rf_max_depth, n_estimators=10
+        )
+
+    score = sklearn.model_selection.cross_val_score(
+        classifier_obj, x, y, n_jobs=-1, cv=3
+    )
+    accuracy = score.mean()
+    return 1 - accuracy
 
 
 if __name__ == "__main__":
