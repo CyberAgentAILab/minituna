@@ -18,7 +18,6 @@ class FrozenTrial:
     state: str  # 'running', 'completed' or 'failed'
     value: float = 0
     params: Dict[str, float] = field(default_factory=dict)
-    distributions: Dict[str, Distribution] = field(default_factory=dict)
 
     @property
     def is_finished(self) -> bool:
@@ -52,12 +51,9 @@ class Storage:
         assert not trial.is_finished, "cannot update finished trials"
         trial.state = state
 
-    def set_trial_param(
-        self, trial_id: int, name: str, distribution: Distribution, value: float
-    ):
+    def set_trial_param(self, trial_id: int, name: str, value: float):
         trial = self.trials[trial_id]
         assert not trial.is_finished, "cannot update finished trials"
-        trial.distributions[name] = distribution
         trial.params[name] = value
 
 
@@ -73,7 +69,7 @@ class Trial:
         param = self.study.sampler.sample_independent(
             self.study, trial, name, distribution
         )
-        self.study.storage.set_trial_param(self.trial_id, name, distribution, param)
+        self.study.storage.set_trial_param(self.trial_id, name, param)
         return param
 
 

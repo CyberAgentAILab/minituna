@@ -22,10 +22,10 @@ class BaseDistribution(abc.ABC):
         ...
 
 
+@dataclass
 class UniformDistribution(BaseDistribution):
-    def __init__(self, low: float, high: float) -> None:
-        self.low = low
-        self.high = high
+    low: float
+    high: float
 
     def to_internal_repr(self, external_repr: Any) -> float:
         return external_repr
@@ -34,10 +34,10 @@ class UniformDistribution(BaseDistribution):
         return internal_repr
 
 
+@dataclass
 class LogUniformDistribution(BaseDistribution):
-    def __init__(self, low: float, high: float) -> None:
-        self.low = low
-        self.high = high
+    low: float
+    high: float
 
     def to_internal_repr(self, external_repr: Any) -> float:
         return external_repr
@@ -46,10 +46,10 @@ class LogUniformDistribution(BaseDistribution):
         return internal_repr
 
 
+@dataclass
 class IntUniformDistribution(BaseDistribution):
-    def __init__(self, low: int, high: int) -> None:
-        self.low = low
-        self.high = high
+    low: int
+    high: int
 
     def to_internal_repr(self, external_repr: Any) -> float:
         return float(external_repr)
@@ -58,9 +58,9 @@ class IntUniformDistribution(BaseDistribution):
         return int(internal_repr)
 
 
+@dataclass
 class CategoricalDistribution(BaseDistribution):
-    def __init__(self, choices: List[CategoricalChoiceType]):
-        self.choices = choices
+    choices: List[CategoricalChoiceType]
 
     def to_internal_repr(self, external_repr: Any) -> float:
         return self.choices.index(external_repr)
