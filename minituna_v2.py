@@ -1,4 +1,5 @@
 import abc
+import copy
 import math
 import random
 
@@ -102,11 +103,12 @@ class Storage:
         return trial_id
 
     def get_trial(self, trial_id: int) -> FrozenTrial:
-        return self.trials[trial_id]
+        return copy.deepcopy(self.trials[trial_id])
 
     def get_best_trial(self) -> FrozenTrial:
         completed_trials = [t for t in self.trials if t.state == "completed"]
-        return min(completed_trials, key=lambda t: t.value)
+        best_trial = min(completed_trials, key=lambda t: t.value)
+        return copy.deepcopy(best_trial)
 
     def set_trial_value(self, trial_id: int, value: float):
         trial = self.trials[trial_id]
