@@ -126,25 +126,25 @@ class Storage:
         best_trial = min(completed_trials, key=lambda t: t.value)
         return copy.deepcopy(best_trial)
 
-    def set_trial_value(self, trial_id: int, value: float):
+    def set_trial_value(self, trial_id: int, value: float) -> None:
         trial = self.trials[trial_id]
         assert not trial.is_finished, "cannot update finished trials"
         trial.value = value
 
-    def set_trial_state(self, trial_id: int, state: str):
+    def set_trial_state(self, trial_id: int, state: str) -> None:
         trial = self.trials[trial_id]
         assert not trial.is_finished, "cannot update finished trials"
         trial.state = state
 
     def set_trial_param(
         self, trial_id: int, name: str, distribution: BaseDistribution, value: float
-    ):
+    ) -> None:
         trial = self.trials[trial_id]
         assert not trial.is_finished, "cannot update finished trials"
         trial.distributions[name] = distribution
         trial.internal_params[name] = value
 
-    def set_trial_intermediate_value(self, trial_id: int, step: int, value: float):
+    def set_trial_intermediate_value(self, trial_id: int, step: int, value: float) -> None:
         trial = self.trials[trial_id]
         assert not trial.is_finished, "cannot update finished trials"
         trial.intermediate_values[step] = value
@@ -175,12 +175,12 @@ class Trial:
     def suggest_loguniform(self, name: str, low: float, high: float) -> float:
         return self._suggest(name, LogUniformDistribution(low=low, high=high))
 
-    def suggest_int(self, name: str, low: int, high: int) -> float:
+    def suggest_int(self, name: str, low: int, high: int) -> int:
         return self._suggest(name, IntUniformDistribution(low=low, high=high))
 
     def suggest_categorical(
         self, name: str, choices: List[CategoricalChoiceType]
-    ) -> float:
+    ) -> CategoricalChoiceType:
         return self._suggest(name, CategoricalDistribution(choices=choices))
 
     def report(self, value: float, step: int) -> None:
@@ -218,7 +218,7 @@ class Sampler:
 
 
 class Pruner:
-    def __init__(self, n_startup_trials: int = 5, n_warmup_steps: int = 0):
+    def __init__(self, n_startup_trials: int = 5, n_warmup_steps: int = 0) -> None:
         self.n_startup_trials = n_startup_trials
         self.n_warmup_steps = n_warmup_steps
 
@@ -244,7 +244,7 @@ class Pruner:
 
 
 class Study:
-    def __init__(self, storage: Storage, sampler: Sampler, pruner: Pruner):
+    def __init__(self, storage: Storage, sampler: Sampler, pruner: Pruner) -> None:
         self.storage = storage
         self.sampler = sampler
         self.pruner = pruner
@@ -275,7 +275,7 @@ class Study:
                 print(f"trial_id={trial_id} is failed by {e}")
 
     @property
-    def best_trial(self):
+    def best_trial(self) -> FrozenTrial:
         return self.storage.get_best_trial()
 
 

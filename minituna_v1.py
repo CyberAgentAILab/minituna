@@ -37,24 +37,24 @@ class Storage:
         best_trial = min(completed_trials, key=lambda t: t.value)
         return copy.deepcopy(best_trial)
 
-    def set_trial_value(self, trial_id: int, value: float):
+    def set_trial_value(self, trial_id: int, value: float) -> None:
         trial = self.trials[trial_id]
         assert not trial.is_finished, "cannot update finished trials"
         trial.value = value
 
-    def set_trial_state(self, trial_id: int, state: str):
+    def set_trial_state(self, trial_id: int, state: str) -> None:
         trial = self.trials[trial_id]
         assert not trial.is_finished, "cannot update finished trials"
         trial.state = state
 
-    def set_trial_param(self, trial_id: int, name: str, value: float):
+    def set_trial_param(self, trial_id: int, name: str, value: float) -> None:
         trial = self.trials[trial_id]
         assert not trial.is_finished, "cannot update finished trials"
         trial.params[name] = value
 
 
 class Trial:
-    def __init__(self, study: "Study", trial_id: int):
+    def __init__(self, study: "Study", trial_id: int) -> None:
         self.study = study
         self.trial_id = trial_id
         self.state = "running"
@@ -70,7 +70,7 @@ class Trial:
 
 
 class Sampler:
-    def __init__(self, seed: int = None):
+    def __init__(self, seed: int = None) -> None:
         self.rng = random.Random(seed)
 
     def sample_independent(
@@ -84,7 +84,7 @@ class Sampler:
 
 
 class Study:
-    def __init__(self, storage: Storage, sampler: Sampler):
+    def __init__(self, storage: Storage, sampler: Sampler) -> None:
         self.storage = storage
         self.sampler = sampler
 
@@ -103,7 +103,7 @@ class Study:
                 print(f"trial_id={trial_id} is failed by {e}")
 
     @property
-    def best_trial(self):
+    def best_trial(self) -> FrozenTrial:
         return self.storage.get_best_trial()
 
 
