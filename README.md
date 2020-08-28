@@ -4,6 +4,8 @@ Simplified Optuna implementation for new contributors.
 
 ## minituna_v1
 
+https://github.com/optuna/optuna/blob/master/examples/quadratic_simple.py
+
 ```python
 import minituna_v1 as minituna
 
@@ -19,21 +21,23 @@ if __name__ == "__main__":
 ```
 
 ```console
-$ python example.py
-trial_id=0 is completed with value=0.11539445997147783
-trial_id=1 is completed with value=11.554241070552933
-trial_id=2 is completed with value=6.956107970175709
-trial_id=3 is completed with value=8.452114918501348
-trial_id=4 is completed with value=1.2053458904783958
-trial_id=5 is completed with value=36.097821542061666
-trial_id=6 is completed with value=61.63078249453704
-trial_id=7 is completed with value=3.256384442457427
-trial_id=8 is completed with value=16.07359934215089
-trial_id=9 is completed with value=10.693346790638826
-Best trial: FrozenTrial(trial_id=0, state='completed', value=0.11539445997147783, params={'x': 2.9999186187424467, 'y': 5.33969759102556}, distributions={'x': Distribution(low=0, high=10), 'y': Distribution(low=0, high=10)})
+$ python example_quadratic.py
+trial_id=0 is completed with value=13.275505983863615
+trial_id=1 is completed with value=34.1227147864478
+trial_id=2 is completed with value=11.199369841219616
+trial_id=3 is completed with value=15.051955617824198
+trial_id=4 is completed with value=26.7725919634248
+trial_id=5 is completed with value=42.093131408456784
+trial_id=6 is completed with value=17.01377949289734
+trial_id=7 is completed with value=8.868050512421352
+trial_id=8 is completed with value=11.002184635683296
+trial_id=9 is completed with value=7.905097506668502
+Best trial: FrozenTrial(trial_id=9, state='completed', value=7.905097506668502, params={'x': 4.654302572011295, 'y': 2.726592753837246})
 ```
 
 ## minituna_v2
+
+https://github.com/optuna/optuna/blob/master/examples/sklearn_simple.py
 
 ```python
 import minituna_v2 as minituna
@@ -75,7 +79,7 @@ if __name__ == "__main__":
     )
 ```
 
-```
+```console
 $ python example_sklearn.py
 trial_id=0 is completed with value=0.040000000000000036
 trial_id=1 is completed with value=0.6799999999999999
