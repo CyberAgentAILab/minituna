@@ -3,7 +3,6 @@ import copy
 import math
 import random
 
-from dataclasses import dataclass, field
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -24,10 +23,10 @@ class BaseDistribution(abc.ABC):
         ...
 
 
-@dataclass
 class UniformDistribution(BaseDistribution):
-    low: float
-    high: float
+    def __init__(self, low: float, high: float) -> None:
+        self.low = low
+        self.high = high
 
     def to_internal_repr(self, external_repr: Any) -> float:
         return external_repr
@@ -36,10 +35,10 @@ class UniformDistribution(BaseDistribution):
         return internal_repr
 
 
-@dataclass
 class LogUniformDistribution(BaseDistribution):
-    low: float
-    high: float
+    def __init__(self, low: float, high: float) -> None:
+        self.low = low
+        self.high = high
 
     def to_internal_repr(self, external_repr: Any) -> float:
         return external_repr
@@ -48,10 +47,10 @@ class LogUniformDistribution(BaseDistribution):
         return internal_repr
 
 
-@dataclass
 class IntUniformDistribution(BaseDistribution):
-    low: int
-    high: int
+    def __init__(self, low: int, high: int) -> None:
+        self.low = low
+        self.high = high
 
     def to_internal_repr(self, external_repr: Any) -> float:
         return float(external_repr)
@@ -60,9 +59,9 @@ class IntUniformDistribution(BaseDistribution):
         return int(internal_repr)
 
 
-@dataclass
 class CategoricalDistribution(BaseDistribution):
-    choices: List[CategoricalChoiceType]
+    def __init__(self, choices: List[CategoricalChoiceType]) -> None:
+        self.choices = choices
 
     def to_internal_repr(self, external_repr: Any) -> float:
         return self.choices.index(external_repr)
@@ -71,13 +70,13 @@ class CategoricalDistribution(BaseDistribution):
         return self.choices[int(internal_repr)]
 
 
-@dataclass
 class FrozenTrial:
-    trial_id: int
-    state: str  # 'running', 'completed' or 'failed'
-    value: Optional[float] = None
-    internal_params: Dict[str, float] = field(default_factory=dict)
-    distributions: Dict[str, BaseDistribution] = field(default_factory=dict)
+    def __init__(self, trial_id: int, state: str) -> None:
+        self.trial_id = trial_id
+        self.state = state  # 'running', 'completed' or 'failed'
+        self.value: Optional[float] = None
+        self.internal_params: Dict[str, float] = {}
+        self.distributions: Dict[str, BaseDistribution] = {}
 
     @property
     def is_finished(self) -> bool:
@@ -172,10 +171,36 @@ class Trial:
         return self._suggest(name, CategoricalDistribution(choices=choices))
 
 
+class Sampler:
+    def __init__(self, seed: int = None):
+        self.rng = random.Random(seed)
+
+    def sample_independent(
+        self,
+        study: "Study",
+        trial: FrozenTrial,
+        name: str,
+        distribution: BaseDistribution,
+    ) -> Any:
+        if isinstance(distribution, UniformDistribution):
+            return self.rng.uniform(distribution.low, distribution.high)
+        elif isinstance(distribution, LogUniformDistribution):
+            log_low = math.log(distribution.low)
+            log_high = math.log(distribution.high)
+            return math.exp(self.rng.uniform(log_low, log_high))
+        elif isinstance(distribution, IntUniformDistribution):
+            return self.rng.randint(distribution.low, distribution.high)
+        elif isinstance(distribution, CategoricalDistribution):
+            index = self.rng.randint(0, len(distribution.choices) - 1)
+            return distribution.choices[index]
+        else:
+            raise ValueError("unsupported distribution")
+
+
 class Study:
-    def __init__(self):
-        self.storage = Storage()
-        self.sampler = RandomSampler()
+    def __init__(self, storage: Storage, sampler: Sampler) -> None:
+        self.storage = storage
+        self.sampler = sampler
 
     def optimize(self, objective: Callable[[Trial], float], n_trials: int) -> None:
         for _ in range(n_trials):
@@ -196,31 +221,11 @@ class Study:
         return self.storage.get_best_trial()
 
 
-class RandomSampler:
-    def __init__(self, seed: int = None):
-        self.rng = random.Random(seed)
-
-    def sample_independent(
-        self,
-        study: Study,
-        trial: FrozenTrial,
-        name: str,
-        distribution: BaseDistribution,
-    ) -> Any:
-        if isinstance(distribution, UniformDistribution):
-            return self.rng.uniform(distribution.low, distribution.high)
-        elif isinstance(distribution, LogUniformDistribution):
-            log_low = math.log(distribution.low)
-            log_high = math.log(distribution.high)
-            return math.exp(self.rng.uniform(log_low, log_high))
-        elif isinstance(distribution, IntUniformDistribution):
-            return self.rng.randint(distribution.low, distribution.high)
-        elif isinstance(distribution, CategoricalDistribution):
-            index = self.rng.randint(0, len(distribution.choices) - 1)
-            return distribution.choices[index]
-        else:
-            raise ValueError("unsupported distribution")
-
-
-def create_study() -> Study:
-    return Study()
+def create_study(
+    storage: Optional[Storage] = None,
+    sampler: Optional[Sampler] = None,
+) -> Study:
+    return Study(
+        storage=storage or Storage(),
+        sampler=sampler or Sampler(),
+    )

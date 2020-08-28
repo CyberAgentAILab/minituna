@@ -1,25 +1,24 @@
 import copy
 import random
 
-from dataclasses import dataclass, field
 from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Optional
 
 
-@dataclass
 class Distribution:
-    low: float
-    high: float
+    def __init__(self, low: float, high: float) -> None:
+        self.low = low
+        self.high = high
 
 
-@dataclass
 class FrozenTrial:
-    trial_id: int
-    state: str  # 'running', 'completed' or 'failed'
-    value: Optional[float] = None
-    params: Dict[str, float] = field(default_factory=dict)
+    def __init__(self, trial_id: int, state: str) -> None:
+        self.trial_id = trial_id
+        self.state = state  # 'running', 'completed' or 'failed'
+        self.value: Optional[float] = None
+        self.params: Dict[str, float] = {}
 
     @property
     def is_finished(self) -> bool:
@@ -76,10 +75,24 @@ class Trial:
         return param
 
 
+class Sampler:
+    def __init__(self, seed: int = None):
+        self.rng = random.Random(seed)
+
+    def sample_independent(
+        self,
+        study: "Study",
+        trial: FrozenTrial,
+        name: str,
+        distribution: Distribution,
+    ) -> float:
+        return self.rng.uniform(distribution.low, distribution.high)
+
+
 class Study:
-    def __init__(self):
-        self.storage = Storage()
-        self.sampler = RandomSampler()
+    def __init__(self, storage: Storage, sampler: Sampler):
+        self.storage = storage
+        self.sampler = sampler
 
     def optimize(self, objective: Callable[[Trial], float], n_trials: int) -> None:
         for _ in range(n_trials):
@@ -100,19 +113,11 @@ class Study:
         return self.storage.get_best_trial()
 
 
-class RandomSampler:
-    def __init__(self, seed: int = None):
-        self.rng = random.Random(seed)
-
-    def sample_independent(
-        self,
-        study: Study,
-        trial: FrozenTrial,
-        name: str,
-        distribution: Distribution,
-    ) -> float:
-        return self.rng.uniform(distribution.low, distribution.high)
-
-
-def create_study() -> Study:
-    return Study()
+def create_study(
+    storage: Optional[Storage] = None,
+    sampler: Optional[Sampler] = None,
+) -> Study:
+    return Study(
+        storage=storage or Storage(),
+        sampler=sampler or Sampler(),
+    )
