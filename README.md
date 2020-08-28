@@ -150,35 +150,35 @@ if __name__ == "__main__":
 
 ```console
 $ python example_pruning.py
-trial_id=0 is completed with value=0.33199999999999996
-trial_id=1 is completed with value=0.22599999999999998
-trial_id=2 is completed with value=0.21399999999999997
-trial_id=3 is completed with value=0.18899999999999995
-trial_id=4 is completed with value=0.91
-trial_id=5 is completed with value=0.918
-trial_id=6 is completed with value=0.354
-trial_id=7 is completed with value=0.898
-trial_id=8 is completed with value=0.35
-trial_id=9 is pruned at step=0 value=0.275
-trial_id=10 is pruned at step=0 value=0.219
-trial_id=11 is pruned at step=0 value=0.313
-trial_id=12 is pruned at step=0 value=0.319
-trial_id=13 is pruned at step=0 value=0.331
-trial_id=14 is pruned at step=1 value=0.128
-trial_id=15 is pruned at step=0 value=0.271
-trial_id=16 is pruned at step=1 value=0.191
-trial_id=17 is pruned at step=0 value=0.47
-trial_id=18 is pruned at step=1 value=0.286
-trial_id=19 is completed with value=0.882
-trial_id=20 is pruned at step=2 value=0.192
-trial_id=21 is pruned at step=0 value=0.231
-trial_id=22 is pruned at step=1 value=0.191
-trial_id=23 is pruned at step=0 value=0.535
-trial_id=24 is pruned at step=0 value=0.47
-trial_id=25 is pruned at step=2 value=0.16
-trial_id=26 is pruned at step=1 value=0.239
-trial_id=27 is pruned at step=1 value=0.273
-trial_id=28 is pruned at step=3 value=0.182
-trial_id=29 is completed with value=0.45099999999999996
-Best trial: id=3 value=0.18899999999999995 params={'n_units_l0': 52, 'n_units_l1': 47, 'n_units_l2': 35, 'lr_init': 0.002809782696278898}
+trial_id=0 is completed with value=0.645
+trial_id=1 is completed with value=0.30200000000000005
+trial_id=2 is completed with value=0.885
+trial_id=3 is completed with value=0.891
+trial_id=4 is completed with value=0.241
+trial_id=5 is completed with value=0.36
+trial_id=6 is completed with value=0.30600000000000005
+trial_id=7 is pruned at step=0 value=0.868
+trial_id=8 is completed with value=0.20199999999999996
+trial_id=9 is pruned at step=0 value=0.874
+trial_id=10 is completed with value=0.31699999999999995
+trial_id=11 is pruned at step=0 value=0.9
+trial_id=12 is pruned at step=1 value=0.835
+trial_id=13 is completed with value=0.238
+trial_id=14 is completed with value=0.19799999999999995
+trial_id=15 is pruned at step=0 value=0.9299999999999999
+trial_id=16 is completed with value=0.22799999999999998
+trial_id=17 is pruned at step=0 value=0.882
+trial_id=18 is completed with value=0.256
+trial_id=19 is pruned at step=0 value=0.87
+trial_id=20 is pruned at step=0 value=0.864
+trial_id=21 is pruned at step=11 value=0.377
+trial_id=22 is completed with value=0.22799999999999998
+trial_id=23 is completed with value=0.236
+trial_id=24 is completed with value=0.20299999999999996
+trial_id=25 is pruned at step=0 value=0.895
+trial_id=26 is pruned at step=0 value=0.899
+trial_id=27 is pruned at step=0 value=0.858
+trial_id=28 is completed with value=0.21899999999999997
+trial_id=29 is pruned at step=45 value=0.267
+Best trial: id=14 value=0.19799999999999995 params={'n_units_l0': 52, 'n_units_l1': 51, 'n_units_l2': 61, 'lr_init': 0.005854153852825279}
 ```
