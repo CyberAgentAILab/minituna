@@ -57,7 +57,7 @@ def objective(trial):
 
     classifier_name = trial.suggest_categorical("classifier", ["SVC", "RandomForest"])
     if classifier_name == "SVC":
-        svc_c = trial.suggest_float("svc_c", 1e-10, 1e10, log=True)
+        svc_c = trial.suggest_loguniform("svc_c", 1e-10, 1e10)
         classifier_obj = sklearn.svm.SVC(C=svc_c, gamma="auto")
     else:
         rf_max_depth = trial.suggest_int("rf_max_depth", 2, 32)
@@ -130,7 +130,7 @@ def objective(trial):
         hidden_layer_sizes=tuple(
             [trial.suggest_int("n_units_l{}".format(i), 32, 64) for i in range(3)]
         ),
-        learning_rate_init=trial.suggest_float("lr_init", 1e-5, 1e-1, log=True),
+        learning_rate_init=trial.suggest_loguniform("lr_init", 1e-5, 1e-1),
     )
 
     for step in range(100):

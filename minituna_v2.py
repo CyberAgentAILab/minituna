@@ -96,7 +96,7 @@ class Storage:
     def __init__(self) -> None:
         self.trials: List[FrozenTrial] = []
 
-    def create_new_trial_id(self) -> int:
+    def create_new_trial(self) -> int:
         trial_id = len(self.trials)
         trial = FrozenTrial(trial_id=trial_id, state="running")
         self.trials.append(trial)
@@ -149,18 +149,10 @@ class Trial:
         return param_value
 
     def suggest_uniform(self, name: str, low: float, high: float) -> float:
-        return self.suggest_float(name, low, high, log=False)
+        return self._suggest(name, UniformDistribution(low=low, high=high))
 
     def suggest_loguniform(self, name: str, low: float, high: float) -> float:
-        return self.suggest_float(name, low, high, log=True)
-
-    def suggest_float(self, name: str, low: float, high: float, log=False) -> float:
-        distribution: BaseDistribution
-        if log:
-            distribution = LogUniformDistribution(low=low, high=high)
-        else:
-            distribution = UniformDistribution(low=low, high=high)
-        return self._suggest(name, distribution)
+        return self._suggest(name, LogUniformDistribution(low=low, high=high))
 
     def suggest_int(self, name: str, low: int, high: int) -> float:
         return self._suggest(name, IntUniformDistribution(low=low, high=high))
@@ -204,7 +196,7 @@ class Study:
 
     def optimize(self, objective: Callable[[Trial], float], n_trials: int) -> None:
         for _ in range(n_trials):
-            trial_id = self.storage.create_new_trial_id()
+            trial_id = self.storage.create_new_trial()
             trial = Trial(self, trial_id)
 
             try:

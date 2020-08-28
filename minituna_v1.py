@@ -7,12 +7,6 @@ from typing import List
 from typing import Optional
 
 
-class Distribution:
-    def __init__(self, low: float, high: float) -> None:
-        self.low = low
-        self.high = high
-
-
 class FrozenTrial:
     def __init__(self, trial_id: int, state: str) -> None:
         self.trial_id = trial_id
@@ -29,7 +23,7 @@ class Storage:
     def __init__(self) -> None:
         self.trials: List[FrozenTrial] = []
 
-    def create_new_trial_id(self) -> int:
+    def create_new_trial(self) -> int:
         trial_id = len(self.trials)
         trial = FrozenTrial(trial_id=trial_id, state="running")
         self.trials.append(trial)
@@ -66,8 +60,8 @@ class Trial:
         self.state = "running"
 
     def suggest_uniform(self, name: str, low: float, high: float) -> float:
-        distribution = Distribution(low=low, high=high)
         trial = self.study.storage.get_trial(self.trial_id)
+        distribution: Dict[str, float] = {"low": low, "high": high}
         param = self.study.sampler.sample_independent(
             self.study, trial, name, distribution
         )
@@ -84,9 +78,9 @@ class Sampler:
         study: "Study",
         trial: FrozenTrial,
         name: str,
-        distribution: Distribution,
+        distribution: Dict[str, float],
     ) -> float:
-        return self.rng.uniform(distribution.low, distribution.high)
+        return self.rng.uniform(distribution["low"], distribution["high"])
 
 
 class Study:
@@ -96,7 +90,7 @@ class Study:
 
     def optimize(self, objective: Callable[[Trial], float], n_trials: int) -> None:
         for _ in range(n_trials):
-            trial_id = self.storage.create_new_trial_id()
+            trial_id = self.storage.create_new_trial()
             trial = Trial(self, trial_id)
 
             try:
