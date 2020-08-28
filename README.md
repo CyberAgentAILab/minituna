@@ -2,9 +2,7 @@
 
 Simplified Optuna implementation for new contributors.
 
-## minituna_v1
-
-https://github.com/optuna/optuna/blob/master/examples/quadratic_simple.py
+## minituna_v1 (≒ 100 lines)
 
 ```python
 import minituna_v1 as minituna
@@ -19,6 +17,9 @@ if __name__ == "__main__":
     study.optimize(objective, 10)
     print("Best trial:", study.best_trial)
 ```
+
+<details>
+<summary>Output of `example_quadratic.py`</summary>
 
 ```console
 $ python example_quadratic.py
@@ -35,7 +36,9 @@ trial_id=9 is completed with value=7.905097506668502
 Best trial: FrozenTrial(trial_id=9, state='completed', value=7.905097506668502, params={'x': 4.654302572011295, 'y': 2.726592753837246})
 ```
 
-## minituna_v2 : More distributions support
+</details>
+
+## minituna_v2 : More distributions support (≒ 200 lines)
 
 https://github.com/optuna/optuna/blob/master/examples/sklearn_simple.py
 
@@ -79,6 +82,9 @@ if __name__ == "__main__":
     )
 ```
 
+<details>
+<summary>Output of `example_sklearn.py`</summary>
+
 ```console
 $ python example_sklearn.py
 trial_id=0 is completed with value=0.040000000000000036
@@ -94,7 +100,9 @@ trial_id=9 is completed with value=0.6799999999999999
 Best trial: id=2 value=0.033333333333333326 params={'classifier': 'RandomForest', 'rf_max_depth': 4}
 ```
 
-## minituna_v3 : Pruning
+</details>
+
+## minituna_v3 : Pruning algorithm support (≒ 300 lines)
 
 https://github.com/optuna/optuna/blob/master/examples/visualization/plot_study.ipynb
 
@@ -149,6 +157,9 @@ if __name__ == "__main__":
     )
 ```
 
+<details>
+<summary>Output of `example_pruning.py`</summary>
+
 ```console
 $ python example_pruning.py
 trial_id=0 is completed with value=0.645
@@ -183,3 +194,5 @@ trial_id=28 is completed with value=0.21899999999999997
 trial_id=29 is pruned at step=45 value=0.267
 Best trial: id=14 value=0.19799999999999995 params={'n_units_l0': 52, 'n_units_l1': 51, 'n_units_l2': 61, 'lr_init': 0.005854153852825279}
 ```
+
+</details>
