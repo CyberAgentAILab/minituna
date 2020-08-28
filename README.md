@@ -35,7 +35,7 @@ trial_id=9 is completed with value=7.905097506668502
 Best trial: FrozenTrial(trial_id=9, state='completed', value=7.905097506668502, params={'x': 4.654302572011295, 'y': 2.726592753837246})
 ```
 
-## minituna_v2
+## minituna_v2 : More distributions support
 
 https://github.com/optuna/optuna/blob/master/examples/sklearn_simple.py
 
@@ -94,49 +94,91 @@ trial_id=9 is completed with value=0.6799999999999999
 Best trial: id=2 value=0.033333333333333326 params={'classifier': 'RandomForest', 'rf_max_depth': 4}
 ```
 
-## minituna_v3
+## minituna_v3 : Pruning
 
-https://github.com/optuna/optuna/blob/master/examples/pruning/simple.py
+https://github.com/optuna/optuna/blob/master/examples/visualization/plot_study.ipynb
 
 ```python
 import minituna_v3 as minituna
 
-import sklearn.datasets
-import sklearn.linear_model
-import sklearn.model_selection
+from sklearn.datasets import fetch_openml
+from sklearn.model_selection import train_test_split
+from sklearn.neural_network import MLPClassifier
+
+
+mnist = fetch_openml(name="Fashion-MNIST", version=1)
+classes = list(set(mnist.target))
+
+# For demonstrational purpose, only use a subset of the dataset.
+n_samples = 4000
+data = mnist.data[:n_samples]
+target = mnist.target[:n_samples]
+
+x_train, x_valid, y_train, y_valid = train_test_split(data, target)
 
 
 def objective(trial):
-    iris = sklearn.datasets.load_iris()
-    classes = list(set(iris.target))
-    train_x, valid_x, train_y, valid_y = sklearn.model_selection.train_test_split(
-        iris.data, iris.target, test_size=0.25
+    clf = MLPClassifier(
+        hidden_layer_sizes=tuple(
+            [trial.suggest_int("n_units_l{}".format(i), 32, 64) for i in range(3)]
+        ),
+        learning_rate_init=trial.suggest_float("lr_init", 1e-5, 1e-1, log=True),
     )
 
-    alpha = trial.suggest_float("alpha", 1e-5, 1e-1, log=True)
-    clf = sklearn.linear_model.SGDClassifier(alpha=alpha)
-
     for step in range(100):
-        clf.partial_fit(train_x, train_y, classes=classes)
+        clf.partial_fit(x_train, y_train, classes=classes)
+        accuracy = clf.score(x_valid, y_valid)
 
         # Report intermediate objective value.
-        intermediate_value = clf.score(valid_x, valid_y)
-        trial.report(intermediate_value, step)
+        trial.report(accuracy, step)
 
         # Handle pruning based on the intermediate value.
         if trial.should_prune():
             raise minituna.TrialPruned()
-
-    accuracy = clf.score(valid_x, valid_y)
     return 1 - accuracy
 
 
 if __name__ == "__main__":
-    study = minituna.create_study()
+    study = minituna.create_study(pruner=minituna.Pruner())
     study.optimize(objective, 30)
 
     best_trial = study.best_trial
     print(
         f"Best trial: id={best_trial.trial_id} value={best_trial.value} params={best_trial.params}"
     )
+```
+
+```console
+$ python example_pruning.py
+trial_id=0 is completed with value=0.33199999999999996
+trial_id=1 is completed with value=0.22599999999999998
+trial_id=2 is completed with value=0.21399999999999997
+trial_id=3 is completed with value=0.18899999999999995
+trial_id=4 is completed with value=0.91
+trial_id=5 is completed with value=0.918
+trial_id=6 is completed with value=0.354
+trial_id=7 is completed with value=0.898
+trial_id=8 is completed with value=0.35
+trial_id=9 is pruned at step=0 value=0.275
+trial_id=10 is pruned at step=0 value=0.219
+trial_id=11 is pruned at step=0 value=0.313
+trial_id=12 is pruned at step=0 value=0.319
+trial_id=13 is pruned at step=0 value=0.331
+trial_id=14 is pruned at step=1 value=0.128
+trial_id=15 is pruned at step=0 value=0.271
+trial_id=16 is pruned at step=1 value=0.191
+trial_id=17 is pruned at step=0 value=0.47
+trial_id=18 is pruned at step=1 value=0.286
+trial_id=19 is completed with value=0.882
+trial_id=20 is pruned at step=2 value=0.192
+trial_id=21 is pruned at step=0 value=0.231
+trial_id=22 is pruned at step=1 value=0.191
+trial_id=23 is pruned at step=0 value=0.535
+trial_id=24 is pruned at step=0 value=0.47
+trial_id=25 is pruned at step=2 value=0.16
+trial_id=26 is pruned at step=1 value=0.239
+trial_id=27 is pruned at step=1 value=0.273
+trial_id=28 is pruned at step=3 value=0.182
+trial_id=29 is completed with value=0.45099999999999996
+Best trial: id=3 value=0.18899999999999995 params={'n_units_l0': 52, 'n_units_l1': 47, 'n_units_l2': 35, 'lr_init': 0.002809782696278898}
 ```

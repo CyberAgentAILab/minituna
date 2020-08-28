@@ -4,7 +4,6 @@ import math
 import random
 import numpy as np
 
-from dataclasses import dataclass, field
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -29,10 +28,10 @@ class BaseDistribution(abc.ABC):
         ...
 
 
-@dataclass
 class UniformDistribution(BaseDistribution):
-    low: float
-    high: float
+    def __init__(self, low: float, high: float) -> None:
+        self.low = low
+        self.high = high
 
     def to_internal_repr(self, external_repr: Any) -> float:
         return external_repr
@@ -41,10 +40,10 @@ class UniformDistribution(BaseDistribution):
         return internal_repr
 
 
-@dataclass
 class LogUniformDistribution(BaseDistribution):
-    low: float
-    high: float
+    def __init__(self, low: float, high: float) -> None:
+        self.low = low
+        self.high = high
 
     def to_internal_repr(self, external_repr: Any) -> float:
         return external_repr
@@ -53,10 +52,10 @@ class LogUniformDistribution(BaseDistribution):
         return internal_repr
 
 
-@dataclass
 class IntUniformDistribution(BaseDistribution):
-    low: int
-    high: int
+    def __init__(self, low: int, high: int) -> None:
+        self.low = low
+        self.high = high
 
     def to_internal_repr(self, external_repr: Any) -> float:
         return float(external_repr)
@@ -65,9 +64,9 @@ class IntUniformDistribution(BaseDistribution):
         return int(internal_repr)
 
 
-@dataclass
 class CategoricalDistribution(BaseDistribution):
-    choices: List[CategoricalChoiceType]
+    def __init__(self, choices: List[CategoricalChoiceType]) -> None:
+        self.choices = choices
 
     def to_internal_repr(self, external_repr: Any) -> float:
         return self.choices.index(external_repr)
@@ -76,14 +75,14 @@ class CategoricalDistribution(BaseDistribution):
         return self.choices[int(internal_repr)]
 
 
-@dataclass
 class FrozenTrial:
-    trial_id: int
-    state: str  # 'running', 'completed', 'pruned' or 'failed'
-    value: float = 0
-    intermediate_values: Dict[int, float] = field(default_factory=dict)
-    internal_params: Dict[str, float] = field(default_factory=dict)
-    distributions: Dict[str, BaseDistribution] = field(default_factory=dict)
+    def __init__(self, trial_id: int, state: str) -> None:
+        self.trial_id = trial_id
+        self.state = state  # 'running', 'completed', 'pruned' or 'failed'
+        self.value: Optional[float] = None
+        self.intermediate_values: Dict[int, float] = {}
+        self.internal_params: Dict[str, float] = {}
+        self.distributions: Dict[str, BaseDistribution] = {}
 
     @property
     def is_finished(self) -> bool:
@@ -200,45 +199,13 @@ class Trial:
         return self.study.pruner.prune(self.study, trial)
 
 
-class Study:
-    def __init__(self):
-        self.storage = Storage()
-        self.sampler = RandomSampler()
-        self.pruner = MedianPruner()
-
-    def optimize(self, objective: Callable[[Trial], float], n_trials: int) -> None:
-        for _ in range(n_trials):
-            trial_id = self.storage.create_new_trial_id()
-            trial = Trial(self, trial_id)
-
-            try:
-                value = objective(trial)
-                self.storage.set_trial_value(trial_id, value)
-                self.storage.set_trial_state(trial_id, "completed")
-                print(f"trial_id={trial_id} is completed with value={value}")
-            except TrialPruned:
-                trial = self.storage.get_trial(trial_id)
-                value = trial.intermediate_values[trial.last_step]
-                self.storage.set_trial_value(trial_id, value)
-                self.storage.set_trial_state(trial_id, "pruned")
-                print(f"trial_id={trial_id} is pruned at step={trial.last_step}"
-                      f" value={trial.intermediate_values[trial.last_step]}")
-            except Exception as e:
-                self.storage.set_trial_state(trial_id, "failed")
-                print(f"trial_id={trial_id} is failed by {e}")
-
-    @property
-    def best_trial(self):
-        return self.storage.get_best_trial()
-
-
-class RandomSampler:
+class Sampler:
     def __init__(self, seed: int = None):
         self.rng = random.Random(seed)
 
     def sample_independent(
         self,
-        study: Study,
+        study: "Study",
         trial: FrozenTrial,
         name: str,
         distribution: BaseDistribution,
@@ -258,27 +225,75 @@ class RandomSampler:
             raise ValueError("unsupported distribution")
 
 
-class MedianPruner:
-    def __init__(self, n_startup_trials: int = 5, n_warmup_steps: int = 0) -> None:
+class Pruner:
+    def __init__(self, n_startup_trials: int = 5, n_warmup_steps: int = 0):
         self.n_startup_trials = n_startup_trials
         self.n_warmup_steps = n_warmup_steps
 
-    def prune(self, study: Study, trial: FrozenTrial) -> bool:
+    def prune(self, study: "Study", trial: FrozenTrial) -> bool:
         all_trials = study.storage.get_all_trials()
         n_trials = len([t for t in all_trials if t.state == "completed"])
 
         if n_trials < self.n_startup_trials:
             return False
 
-        step = trial.last_step
-        if step is None or step < self.n_warmup_steps:
+        last_step = trial.last_step
+        if last_step is None or last_step < self.n_warmup_steps:
             return False
 
-        median = np.nanmedian(np.array([t.intermediate_values[step] for t in all_trials
-                                        if step in t.intermediate_values]))
-        best_value = max(trial.intermediate_values.values())
-        return best_value > median
+        # Median pruning
+        others = [
+            t.intermediate_values[last_step]
+            for t in all_trials
+            if last_step in t.intermediate_values
+        ]
+        median = np.nanmedian(np.array(others))
+        return trial.intermediate_values[last_step] > median
 
 
-def create_study() -> Study:
-    return Study()
+class Study:
+    def __init__(self, storage: Storage, sampler: Sampler, pruner: Pruner):
+        self.storage = storage
+        self.sampler = sampler
+        self.pruner = pruner
+
+    def optimize(self, objective: Callable[[Trial], float], n_trials: int) -> None:
+        for _ in range(n_trials):
+            trial_id = self.storage.create_new_trial_id()
+            trial = Trial(self, trial_id)
+
+            try:
+                value = objective(trial)
+                self.storage.set_trial_value(trial_id, value)
+                self.storage.set_trial_state(trial_id, "completed")
+                print(f"trial_id={trial_id} is completed with value={value}")
+            except TrialPruned:
+                frozen_trial = self.storage.get_trial(trial_id)
+                last_step = frozen_trial.last_step
+                assert last_step is not None
+                value = frozen_trial.intermediate_values[last_step]
+
+                self.storage.set_trial_value(trial_id, value)
+                self.storage.set_trial_state(trial_id, "pruned")
+                print(
+                    f"trial_id={trial_id} is pruned at step={last_step} value={value}"
+                )
+            except Exception as e:
+                self.storage.set_trial_state(trial_id, "failed")
+                print(f"trial_id={trial_id} is failed by {e}")
+
+    @property
+    def best_trial(self):
+        return self.storage.get_best_trial()
+
+
+def create_study(
+    storage: Optional[Storage] = None,
+    sampler: Optional[Sampler] = None,
+    pruner: Optional[Pruner] = None,
+) -> Study:
+    return Study(
+        storage=storage or Storage(),
+        sampler=sampler or Sampler(),
+        pruner=pruner or Pruner(),
+    )
