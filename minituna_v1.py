@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from typing import Callable
 from typing import Dict
 from typing import List
+from typing import Optional
 
 
 @dataclass
@@ -17,7 +18,7 @@ class Distribution:
 class FrozenTrial:
     trial_id: int
     state: str  # 'running', 'completed' or 'failed'
-    value: float = 0
+    value: Optional[float] = None
     params: Dict[str, float] = field(default_factory=dict)
 
     @property

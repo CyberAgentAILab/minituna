@@ -8,6 +8,7 @@ from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import List
+from typing import Optional
 from typing import Union
 
 CategoricalChoiceType = Union[None, bool, int, float, str]
@@ -74,7 +75,7 @@ class CategoricalDistribution(BaseDistribution):
 class FrozenTrial:
     trial_id: int
     state: str  # 'running', 'completed' or 'failed'
-    value: float = 0
+    value: Optional[float] = None
     internal_params: Dict[str, float] = field(default_factory=dict)
     distributions: Dict[str, BaseDistribution] = field(default_factory=dict)
 
