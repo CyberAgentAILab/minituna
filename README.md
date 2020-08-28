@@ -128,14 +128,15 @@ def objective(trial):
     for step in range(100):
         clf.partial_fit(x_train, y_train, classes=classes)
         accuracy = clf.score(x_valid, y_valid)
+        error = 1 - accuracy
 
         # Report intermediate objective value.
-        trial.report(accuracy, step)
+        trial.report(error, step)
 
         # Handle pruning based on the intermediate value.
         if trial.should_prune():
             raise minituna.TrialPruned()
-    return 1 - accuracy
+    return error
 
 
 if __name__ == "__main__":
