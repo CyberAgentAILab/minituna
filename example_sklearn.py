@@ -35,5 +35,5 @@ if __name__ == "__main__":
 
     best_trial = study.best_trial
     print(
-        f"Best trial: id={best_trial.trial_id} value={best_trial.value} params={best_trial.params}"
+        f"Best trial: value={best_trial.value} params={best_trial.params}"
     )
