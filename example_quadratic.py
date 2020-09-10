@@ -10,4 +10,7 @@ def objective(trial: minituna.Trial) -> float:
 if __name__ == "__main__":
     study = minituna.create_study()
     study.optimize(objective, 10)
-    print("Best trial:", study.best_trial)
+    best_trial = study.best_trial
+    print(
+        f"Best trial: value={best_trial.value} params={best_trial.params}"
+    )

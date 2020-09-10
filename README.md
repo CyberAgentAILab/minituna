@@ -15,7 +15,10 @@ def objective(trial: minituna.Trial) -> float:
 if __name__ == "__main__":
     study = minituna.create_study()
     study.optimize(objective, 10)
-    print("Best trial:", study.best_trial)
+    best_trial = study.best_trial
+    print(
+        f"Best trial: value={best_trial.value} params={best_trial.params}"
+    )
 ```
 
 <details>
@@ -23,17 +26,17 @@ if __name__ == "__main__":
 
 ```console
 $ python example_quadratic.py
-trial_id=0 is completed with value=13.275505983863615
-trial_id=1 is completed with value=34.1227147864478
-trial_id=2 is completed with value=11.199369841219616
-trial_id=3 is completed with value=15.051955617824198
-trial_id=4 is completed with value=26.7725919634248
-trial_id=5 is completed with value=42.093131408456784
-trial_id=6 is completed with value=17.01377949289734
-trial_id=7 is completed with value=8.868050512421352
-trial_id=8 is completed with value=11.002184635683296
-trial_id=9 is completed with value=7.905097506668502
-Best trial: FrozenTrial(trial_id=9, state='completed', value=7.905097506668502, params={'x': 4.654302572011295, 'y': 2.726592753837246})
+trial_id=0 is completed with value=36.658565123549835
+trial_id=1 is completed with value=36.58945605027185
+trial_id=2 is completed with value=36.261419630096924
+trial_id=3 is completed with value=15.904426822321941
+trial_id=4 is completed with value=31.00261936939642
+trial_id=5 is completed with value=0.3046670574062946
+trial_id=6 is completed with value=22.093997465381495
+trial_id=7 is completed with value=45.68550817426529
+trial_id=8 is completed with value=21.059586293347397
+trial_id=9 is completed with value=26.691576771270128
+Best trial: value=0.3046670574062946 params={'x': 3.545340140826294, 'y': 4.9147287374911555}
 ```
 
 </details>
