@@ -78,7 +78,7 @@ if __name__ == "__main__":
 
     best_trial = study.best_trial
     print(
-        f"Best trial: id={best_trial.trial_id} value={best_trial.value} params={best_trial.params}"
+        f"Best trial: value={best_trial.value} params={best_trial.params}"
     )
 ```
 
@@ -97,7 +97,7 @@ trial_id=6 is completed with value=0.053333333333333344
 trial_id=7 is completed with value=0.6799999999999999
 trial_id=8 is completed with value=0.040000000000000036
 trial_id=9 is completed with value=0.6799999999999999
-Best trial: id=2 value=0.033333333333333326 params={'classifier': 'RandomForest', 'rf_max_depth': 4}
+Best trial: value=0.033333333333333326 params={'classifier': 'RandomForest', 'rf_max_depth': 4}
 ```
 
 </details>
@@ -148,12 +148,12 @@ def objective(trial):
 
 
 if __name__ == "__main__":
-    study = minituna.create_study(pruner=minituna.Pruner())
+    study = minituna.create_study()
     study.optimize(objective, 30)
 
     best_trial = study.best_trial
     print(
-        f"Best trial: id={best_trial.trial_id} value={best_trial.value} params={best_trial.params}"
+        f"Best trial: value={best_trial.value} params={best_trial.params}"
     )
 ```
 
@@ -192,7 +192,7 @@ trial_id=26 is pruned at step=0 value=0.899
 trial_id=27 is pruned at step=0 value=0.858
 trial_id=28 is completed with value=0.21899999999999997
 trial_id=29 is pruned at step=45 value=0.267
-Best trial: id=14 value=0.19799999999999995 params={'n_units_l0': 52, 'n_units_l1': 51, 'n_units_l2': 61, 'lr_init': 0.005854153852825279}
+Best trial: value=0.19799999999999995 params={'n_units_l0': 52, 'n_units_l1': 51, 'n_units_l2': 61, 'lr_init': 0.005854153852825279}
 ```
 
 </details>
