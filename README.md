@@ -1,6 +1,7 @@
 # minituna
 
 Simplified Optuna implementation for new contributors.
+Required Python version is 3.8 or later (due to the use of `typing.Literal`).
 
 ## minituna_v1 (≒ 100 lines)
 

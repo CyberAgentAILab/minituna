@@ -5,11 +5,14 @@ import random
 
 from typing import Any
 from typing import Callable
+from typing import cast
 from typing import Dict
 from typing import List
+from typing import Literal
 from typing import Optional
 from typing import Union
 
+TrialStateType = Literal["running", "completed", "failed"]
 CategoricalChoiceType = Union[None, bool, int, float, str]
 
 
@@ -71,9 +74,9 @@ class CategoricalDistribution(BaseDistribution):
 
 
 class FrozenTrial:
-    def __init__(self, trial_id: int, state: str) -> None:
+    def __init__(self, trial_id: int, state: TrialStateType) -> None:
         self.trial_id = trial_id
-        self.state = state  # 'running', 'completed' or 'failed'
+        self.state = state
         self.value: Optional[float] = None
         self.internal_params: Dict[str, float] = {}
         self.distributions: Dict[str, BaseDistribution] = {}
@@ -105,9 +108,9 @@ class Storage:
     def get_trial(self, trial_id: int) -> FrozenTrial:
         return copy.deepcopy(self.trials[trial_id])
 
-    def get_best_trial(self) -> FrozenTrial:
+    def get_best_trial(self) -> Optional[FrozenTrial]:
         completed_trials = [t for t in self.trials if t.state == "completed"]
-        best_trial = min(completed_trials, key=lambda t: t.value)
+        best_trial = min(completed_trials, key=lambda t: cast(float, t.value))
         return copy.deepcopy(best_trial)
 
     def set_trial_value(self, trial_id: int, value: float) -> None:
@@ -115,7 +118,7 @@ class Storage:
         assert not trial.is_finished, "cannot update finished trials"
         trial.value = value
 
-    def set_trial_state(self, trial_id: int, state: str) -> None:
+    def set_trial_state(self, trial_id: int, state: TrialStateType) -> None:
         trial = self.trials[trial_id]
         assert not trial.is_finished, "cannot update finished trials"
         trial.state = state
@@ -209,7 +212,7 @@ class Study:
                 print(f"trial_id={trial_id} is failed by {e}")
 
     @property
-    def best_trial(self) -> FrozenTrial:
+    def best_trial(self) -> Optional[FrozenTrial]:
         return self.storage.get_best_trial()
 
 
