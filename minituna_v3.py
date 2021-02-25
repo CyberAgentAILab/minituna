@@ -147,7 +147,9 @@ class Storage:
         trial.distributions[name] = distribution
         trial.internal_params[name] = value
 
-    def set_trial_intermediate_value(self, trial_id: int, step: int, value: float) -> None:
+    def set_trial_intermediate_value(
+        self, trial_id: int, step: int, value: float
+    ) -> None:
         trial = self.trials[trial_id]
         assert not trial.is_finished, "cannot update finished trials"
         trial.intermediate_values[step] = value

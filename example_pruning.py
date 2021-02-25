@@ -45,6 +45,4 @@ if __name__ == "__main__":
     study.optimize(objective, 30)
 
     best_trial = study.best_trial
-    print(
-        f"Best trial: value={best_trial.value} params={best_trial.params}"
-    )
+    print(f"Best trial: value={best_trial.value} params={best_trial.params}")
