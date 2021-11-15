@@ -1,7 +1,6 @@
 # minituna
 
-Simplified Optuna implementation for new contributors.
-Required Python version is 3.8 or later (due to the use of `typing.Literal`).
+minituna is a toy hyperparameter optimization framework intended for understanding Optuna's internal design. Required Python version is 3.8 or later (due to the use of `typing.Literal`).
 
 ## minituna_v1 (≒ 100 lines)
 
