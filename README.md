@@ -2,6 +2,10 @@
 
 Minituna is a toy hyperparameter optimization framework intended for understanding Optuna's internal design. Required Python version is 3.8 or later (due to the use of `typing.Literal`).
 
+* English Article: [An Introduction to the Implementation of Optuna, a Hyperparameter Optimization Framework - Optuna Medium Blog](https://medium.com/optuna/an-introduction-to-the-implementation-of-optuna-a-hyperparameter-optimization-framework-33995d9ec354)
+* Japanese Article: [ハイパーパラメーター最適化フレームワークOptunaの実装解説 - CyberAgent AI Labブログ](https://cyberagent.ai/blog/research/optuna-from-scratch)
+
+
 ## minituna_v1 (≒ 100 lines)
 
 ```python
